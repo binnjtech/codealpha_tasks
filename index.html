@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Free Language Translator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image: url('trans.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+      margin: 0 auto;
+    }
+    
+    .logo-container {
+      margin-bottom: 30px; 
+    }
+
+    .logo {
+      max-width: 100%; 
+      height: auto50px;
+    }
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2em;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: 600;
+    }
+
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+
+    textarea {
+      height: 100px;
+      resize: vertical;
+    }
+
+    button {
+      background-color: #1abc9c;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #16a085;
+    }
+
+    .output {
+      background: #16a085;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+      font-size: 16px;
+      min-height: 50px;
+      word-wrap: break-word;
+      text-align: left;
+    }
+
+    footer {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      font-size: 0.9em;
+      color: #ccc;
+      text-align: center;
+    }
+
+    footer p {
+      margin: 5px 0;
+    }
+
+    footer a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+    
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="logo-container">
+      <img src="Binnj Group.png" alt="Binnj Group Logo" class="logo" />
+    
+    <h1>Universal Language Translator</h1>
+
+    <label for="fromLang">From:</label>
+    <select id="fromLang"></select>
+
+    <label for="toLang">To:</label>
+    <select id="toLang"></select>
+
+    <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+    <button onclick="translateText()">Translate</button>
+
+    <h3>Translated Text:</h3>
+    <div class="output" id="outputText">...</div>
+  </div>
+
+  <script>
+    const languages = {
+      "af": "Afrikaans", "sq": "Albanian", "am": "Amharic", "ar": "Arabic", "hy": "Armenian",
+      "az": "Azerbaijani", "eu": "Basque", "be": "Belarusian", "bn": "Bengali", "bs": "Bosnian",
+      "bg": "Bulgarian", "ca": "Catalan", "ceb": "Cebuano", "ny": "Chichewa", "zh-CN": "Chinese (Simplified)",
+      "zh-TW": "Chinese (Traditional)", "co": "Corsican", "hr": "Croatian", "cs": "Czech", "da": "Danish",
+      "nl": "Dutch", "en": "English", "eo": "Esperanto", "et": "Estonian", "tl": "Filipino",
+      "fi": "Finnish", "fr": "French", "fy": "Frisian", "gl": "Galician", "ka": "Georgian",
+      "de": "German", "el": "Greek", "gu": "Gujarati", "ht": "Haitian Creole", "ha": "Hausa",
+      "haw": "Hawaiian", "iw": "Hebrew", "hi": "Hindi", "hmn": "Hmong", "hu": "Hungarian",
+      "is": "Icelandic", "ig": "Igbo", "id": "Indonesian", "ga": "Irish", "it": "Italian",
+      "ja": "Japanese", "jw": "Javanese", "kn": "Kannada", "kk": "Kazakh", "km": "Khmer",
+      "rw": "Kinyarwanda", "ko": "Korean", "ku": "Kurdish", "ky": "Kyrgyz", "lo": "Lao",
+      "la": "Latin", "lv": "Latvian", "lt": "Lithuanian", "lb": "Luxembourgish", "mk": "Macedonian",
+      "mg": "Malagasy", "ms": "Malay", "ml": "Malayalam", "mt": "Maltese", "mi": "Maori",
+      "mr": "Marathi", "mn": "Mongolian", "my": "Myanmar (Burmese)", "ne": "Nepali", "no": "Norwegian",
+      "or": "Odia", "ps": "Pashto", "fa": "Persian", "pl": "Polish", "pt": "Portuguese",
+      "pa": "Punjabi", "ro": "Romanian", "ru": "Russian", "sm": "Samoan", "gd": "Scots Gaelic",
+      "sr": "Serbian", "st": "Sesotho", "sn": "Shona", "sd": "Sindhi", "si": "Sinhala",
+      "sk": "Slovak", "sl": "Slovenian", "so": "Somali", "es": "Spanish", "su": "Sundanese",
+      "sw": "Swahili", "sv": "Swedish", "tg": "Tajik", "ta": "Tamil", "tt": "Tatar",
+      "te": "Telugu", "th": "Thai", "tr": "Turkish", "tk": "Turkmen", "uk": "Ukrainian",
+      "ur": "Urdu", "ug": "Uyghur", "uz": "Uzbek", "vi": "Vietnamese", "cy": "Welsh",
+      "xh": "Xhosa", "yi": "Yiddish", "yo": "Yoruba", "zu": "Zulu"
+    };
+
+    const fromSelect = document.getElementById('fromLang');
+    const toSelect = document.getElementById('toLang');
+
+    for (let code in languages) {
+      const option1 = document.createElement('option');
+      option1.value = code;
+      option1.textContent = languages[code];
+      fromSelect.appendChild(option1);
+
+      const option2 = document.createElement('option');
+      option2.value = code;
+      option2.textContent = languages[code];
+      toSelect.appendChild(option2);
+    }
+
+    fromSelect.value = 'en';
+    toSelect.value = 'fr';   
+
+    async function translateText() {
+      const input = document.getElementById("inputText").value.trim();
+      const from = document.getElementById("fromLang").value;
+      const to = document.getElementById("toLang").value;
+      const output = document.getElementById("outputText");
+
+      if (!input) {
+        output.innerText = "Please enter text to translate.";
+        return;
+      }
+
+      output.innerText = "Translating...";
+
+      try {
+        const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(input)}&langpair=${from}|${to}`);
+        const data = await res.json();
+        output.innerText = data.responseData.translatedText;
+      } catch (error) {
+        output.innerText = "Error: Could not translate text.";
+      }
+    }
+  </script>
+
+  <footer>
+    <p>&copy; 2025 Binnj Group. All rights reserved.</p>
+    <p>Rubavu District, Rwanda</p>
+    <p>Contact: <a href="mailto:ishimwechristian306@gmail.com">ishimwechristian306@gmail.com</a></p>
+    <p>Follow me:</p>
+   <div>
+    
+    <a href="https://www.linkedin.com/in/ishimwe-christian-617192251" target="_blank">
+      <img src="linkedin.svg" alt="LinkedIn" style="width: 30px; margin-right: 10px;">
+    </a>
+    <a href="https://x.com/TalzSpace" target="_blank">
+      <img src="x.png" alt="X" style="width: 30px; margin-right: 10px;">
+    </a>
+   
+    </a>
+  </div>
+</footer>
+  </footer>
+
+</body>
+</html>
